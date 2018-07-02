@@ -1,2 +1,5 @@
 import wikipedia
-print (wikipedia.summary("Iron Man"))
+import sys
+print (sys.argv)
+test = input("Enter Search Term ")
+print (wikipedia.summary(test))
