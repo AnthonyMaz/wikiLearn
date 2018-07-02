@@ -1,1 +1,2 @@
-print('Import wiki to brain')
+import wikipedia
+print (wikipedia.summary("Iron Man"))
