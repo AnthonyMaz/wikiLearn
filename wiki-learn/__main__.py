@@ -1,0 +1,1 @@
+print('Import wiki to brain')
