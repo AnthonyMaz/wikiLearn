@@ -8,6 +8,7 @@ import argparse
 import random
 import os.path
 import pyglet
+from pyglet.gl import *
 
 
 def update_pan_zoom_speeds():
@@ -54,7 +55,12 @@ def update_zoom(dt):
     sprite.scale += dt * _zoom_speed
 
 
+def update_opacity(dt):
+    sprite.opacity += 1
+
+
 def update_image(dt):
+    sprite.opacity = 255
     window.clear()
 
     next_image = next(_playlist)
@@ -99,14 +105,21 @@ if __name__ == "__main__":
     _playlist = build_playlist()
 
     next_image = next(_playlist)
-
     this_image, next_image = next_image, next(_playlist)
+
     first_frame = pyglet.image.load(this_image)
+
+    glEnable(GL_BLEND)
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA)
+    pyglet.gl.glClearColor(0, 0, 0, 0)
+
     sprite = pyglet.sprite.Sprite(first_frame)
     sprite.scale = get_scale(window, first_frame)
 
-    pyglet.clock.schedule_interval(update_image, 4.5)
+    pyglet.clock.schedule_interval(update_image, 2.5)
     pyglet.clock.schedule_interval(update_pan, 1 / 60.0)
     pyglet.clock.schedule_interval(update_zoom, 1 / 60.0)
+    pyglet.clock.schedule_interval(update_opacity, 1 / 60.0)
 
+    win = pyglet.window.Window()
     pyglet.app.run()
