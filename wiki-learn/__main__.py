@@ -11,6 +11,21 @@ import pyglet
 from pyglet.gl import *
 
 
+try:
+    # Try and create a window with multisampling (antialiasing)
+    config = Config(sample_buffers=1, samples=4,
+                    depth_size=16, double_buffer=True, )
+    window = pyglet.window.Window(fullscreen=True, resizable=True, config=config)
+except pyglet.window.NoSuchConfigException:
+    # Fall back to no multisampling for old hardware
+    window = pyglet.window.Window(resizable=True)
+glEnable(GL_BLEND)
+# glEnable(GL_LIGHTING)
+# glEnable(GL_LIGHT0)
+glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA)
+pyglet.gl.glClearColor(0, 0, 0, 0)
+
+
 def update_pan_zoom_speeds():
     global _pan_speed_x
     global _pan_speed_y
@@ -92,34 +107,25 @@ def get_scale(window, image):
     return scale
 
 
-window = pyglet.window.Window(fullscreen=True)
-
-
 @window.event
 def on_draw():
     sprite.draw()
 
 
-if __name__ == "__main__":
-    _pan_speed_x, _pan_speed_y, _zoom_speed = update_pan_zoom_speeds()
-    _playlist = build_playlist()
+_pan_speed_x, _pan_speed_y, _zoom_speed = update_pan_zoom_speeds()
+_playlist = build_playlist()
 
-    next_image = next(_playlist)
-    this_image, next_image = next_image, next(_playlist)
+next_image = next(_playlist)
+this_image, next_image = next_image, next(_playlist)
 
-    first_frame = pyglet.image.load(this_image)
+first_frame = pyglet.image.load(this_image)
 
-    glEnable(GL_BLEND)
-    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA)
-    pyglet.gl.glClearColor(0, 0, 0, 0)
+sprite = pyglet.sprite.Sprite(first_frame)
+sprite.scale = get_scale(window, first_frame)
 
-    sprite = pyglet.sprite.Sprite(first_frame)
-    sprite.scale = get_scale(window, first_frame)
+pyglet.clock.schedule_interval(update_image, 2.5)
+pyglet.clock.schedule_interval(update_pan, 1 / 60.0)
+pyglet.clock.schedule_interval(update_zoom, 1 / 60.0)
+pyglet.clock.schedule_interval(update_opacity, 1 / 60.0)
 
-    pyglet.clock.schedule_interval(update_image, 2.5)
-    pyglet.clock.schedule_interval(update_pan, 1 / 60.0)
-    pyglet.clock.schedule_interval(update_zoom, 1 / 60.0)
-    pyglet.clock.schedule_interval(update_opacity, 1 / 60.0)
-
-    win = pyglet.window.Window()
-    pyglet.app.run()
+pyglet.app.run()
